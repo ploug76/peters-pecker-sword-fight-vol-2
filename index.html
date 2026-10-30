@@ -42,16 +42,17 @@ function resize(){DPR=Math.min(3,window.devicePixelRatio||1);W=Math.max(300,wind
 function layout(two){const o={W,H,portrait:H>=W*1.05,two:!!two,pads:[]};
  const sp=document.getElementById('sp');let st=0,sb=0;if(sp){const cs=getComputedStyle(sp);st=parseFloat(cs.paddingTop)||0;sb=parseFloat(cs.paddingBottom)||0}
  if(o.portrait){const a=CL(Math.floor(Math.min(W/7,H*(two?.075:.09))),56,72),br=CL(Math.round(a*.6),33,42),ph=3*a+(two?30:52);
-  const mk=(py)=>{const cy=py+12+1.5*a+(two?3:6);const pad={cx:6+14+1.5*a,cy,a};const ax=W-6-16-br,gap=Math.max(12,Math.min(26,(ax-br-(pad.cx+1.5*a))-2*br-14)),bx=ax-2*br-gap;
-   return{panel:{x:6,y:py,w:W-12,h:ph},pad,ab:{b:{cx:bx,cy:cy+br*.35,r:br},a:{cx:ax,cy:cy-br*.35,r:br}},rot:0}};
+  // Oct 30 (Peter): JUMP (A) bottom-right, other button (B) bottom-left, mirrored; swipe hint centered
+  const mk=(py)=>{const cy=py+12+1.5*a+(two?3:6);const pad={cx:W/2,cy:cy+br*.35,a};const ax=W-6-16-br,bx=6+16+br;
+   return{panel:{x:6,y:py,w:W-12,h:ph},pad,ab:{b:{cx:bx,cy:cy+br*.35,r:br},a:{cx:ax,cy:cy+br*.35,r:br}},rot:0}};
   const p1=mk(H-6-sb-ph);o.pads.push(p1);
   if(two){const p2=rot180(mk(H-6-sb-ph));p2.panel.y=Math.max(p2.panel.y-0,6);o.pads.push(p2);o.field={x:0,y:p2.panel.y+p2.panel.h+4,w:W,h:p1.panel.y-4-(p2.panel.y+p2.panel.h+4)}}
   else o.field={x:0,y:st,w:W,h:p1.panel.y-4-st}}
  else{const a=CL(Math.floor(H*(two?.13:.15)),56,68),br=CL(Math.round(a*.6),33,40),side=Math.max(3*a+24,4*br+44);
   const B=H-6;
-  if(!two){const pad={cx:side/2,cy:B-4-1.5*a,a};const rx0=W-side,bcy=B-40-br;
-   o.pads.push({panel:{x:4,y:pad.cy-1.5*a-10,w:side-8,h:B-(pad.cy-1.5*a-10)},pad,ab:{b:{cx:rx0+side/2-br-6,cy:bcy,r:br},a:{cx:rx0+side/2+br+6,cy:bcy-br*.7,r:br}},rot:0,
-    panel2:{x:rx0+4,y:bcy-br*.7-br-12,w:side-8,h:B-(bcy-br*.7-br-12)}})}
+  if(!two){const rx0=W-side,bcy=B-40-br,pad={cx:side/2,cy:bcy-br-a*1.05-16,a};   // Oct 30 (Peter): JUMP right panel, other button left panel, mirrored
+   o.pads.push({panel:{x:4,y:pad.cy-1.5*a-10,w:side-8,h:B-(pad.cy-1.5*a-10)},pad,ab:{b:{cx:side/2,cy:bcy,r:br},a:{cx:rx0+side/2,cy:bcy,r:br}},rot:0,
+    panel2:{x:rx0+4,y:bcy-br-40,w:side-8,h:B-(bcy-br-40)}})}
   else{for(const s of [0,1]){const x0=s?W-side:0,pad={cx:x0+side/2,cy:B-4-1.5*a,a},top=pad.cy-1.5*a-24-br;
     const ab={b:{cx:x0+side/2-br-6,cy:top,r:br},a:{cx:x0+side/2+br+6,cy:top-br*.5,r:br}};
     o.pads.push({panel:{x:x0+4,y:top-br*1.5-14,w:side-8,h:B-(top-br*1.5-14)},pad,ab,rot:0})}}
@@ -1053,7 +1054,7 @@ function drawPads(){const lab=(G&&G.M&&G.M.lab)||{a:'JUMP',b:'BOP'};
   if(LY.portrait){const nm=G&&G.two?(G.M.simul?(i?'PLAYER 2':'PLAYER 1'):(G.pl?'PLAYER 2':'PLAYER 1')):HERO.toUpperCase();txt(nm,(pd.ab.b.cx+pd.ab.a.cx)/2,pd.panel.y+24,fit(nm,16,pd.ab.a.cx-pd.ab.b.cx+2*pd.ab.a.r),i?'#8ef56a':'#ff86c4','center',{f:'ui-monospace,monospace'})}
   else if(G&&G.two&&G.M.simul)txt(i?'P2':'P1',pd.panel.x+22,pd.panel.y+22,16,i?'#8ef56a':'#ff86c4');
   // no D-pad (Peter 10/29): swipe and hold to move; hint where the pad used to be (arrows light up while you swipe that way)
-  {const hw=Math.max(60,Math.min(3*a,(pd.ab.b.cx-pd.ab.b.r-cx)*2-8));const M='ui-monospace,monospace';txt('SWIPE',cx,cy-12,fit('SWIPE',16,hw,{f:M}),'#8f8c99','center',{f:M});txt('TO MOVE',cx,cy+12,fit('TO MOVE',16,hw,{f:M}),'#8f8c99','center',{f:M});
+  {const hw=Math.max(60,Math.min(3*a,(LY.portrait?Math.min(pd.ab.a.cx-pd.ab.a.r-cx,cx-pd.ab.b.cx-pd.ab.b.r):(LY.two?pd.ab.b.cx-pd.ab.b.r-cx:a*1.5))*2-8));const M='ui-monospace,monospace';txt('SWIPE',cx,cy-12,fit('SWIPE',16,hw,{f:M}),'#8f8c99','center',{f:M});txt('TO MOVE',cx,cy+12,fit('TO MOVE',16,hw,{f:M}),'#8f8c99','center',{f:M});
    const arm={l:[cx-a*1.05,cy],r:[cx+a*1.05,cy],u:[cx,cy-a*1.05],d:[cx,cy+a*1.05]},ang={l:PI,r:0,u:-PI/2,d:PI/2};
    for(const k of ['l','r','u','d']){const[x,y]=arm[k];if(k=='l'||k=='r'){if(Math.abs(x-cx)>hw/2+14)continue}tri(x,y,a*.16,ang[k],h[k]?'#ffd84a':'#5d5a66')}}
   for(const k of ['b','a']){const q=pd.ab[k],on=h[k],dy=on?2:0;g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();

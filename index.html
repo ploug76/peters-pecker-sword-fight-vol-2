@@ -42,23 +42,25 @@ function resize(){DPR=Math.min(3,window.devicePixelRatio||1);W=Math.max(300,wind
 function layout(two){const o={W,H,portrait:H>=W*1.05,two:!!two,pads:[]};
  const sp=document.getElementById('sp');let st=0,sb=0;if(sp){const cs=getComputedStyle(sp);st=parseFloat(cs.paddingTop)||0;sb=parseFloat(cs.paddingBottom)||0}
  if(o.portrait){const a=CL(Math.floor(Math.min(W/7,H*(two?.075:.09))),56,72),br=CL(Math.round(a*.6),33,42),ph=3*a+(two?30:52);
-  // Oct 30 (Peter): JUMP (A) bottom-right, other button (B) bottom-left, mirrored; swipe hint centered
-  const mk=(py)=>{const cy=py+12+1.5*a+(two?3:6);const pad={cx:W/2,cy:cy+br*.35,a};const ax=W-6-16-br,bx=6+16+br;
-   return{panel:{x:6,y:py,w:W-12,h:ph},pad,ab:{b:{cx:bx,cy:cy+br*.35,r:br},a:{cx:ax,cy:cy+br*.35,r:br}},rot:0}};
+  // Oct 30 9:45 PM (Peter's reference): JUMP (A) big orange bottom-right, other button (B) smaller green just left of it and a bit higher; swipe hint on the left
+  const mk=(py)=>{const pb=py+ph+6,big=CL(ph*.36,92,124),sm=Math.round(big*.84),bot=CL(ph*.14,18,46);
+   const ax=W-16-big/2,ay=pb-bot-big/2,bx=ax-big/2-14-sm/2,by=Math.max(py+14+sm/2,pb-bot-big*.42-sm/2);const pad={cx:(14+bx-sm/2)/2,cy:py+ph/2+6,a};
+   return{panel:{x:6,y:py,w:W-12,h:ph},pad,ab:{b:{cx:bx,cy:by,r:sm/2},a:{cx:ax,cy:ay,r:big/2}},rot:0,big}};
   const p1=mk(H-6-sb-ph);o.pads.push(p1);
   if(two){const p2=rot180(mk(H-6-sb-ph));p2.panel.y=Math.max(p2.panel.y-0,6);o.pads.push(p2);o.field={x:0,y:p2.panel.y+p2.panel.h+4,w:W,h:p1.panel.y-4-(p2.panel.y+p2.panel.h+4)}}
   else o.field={x:0,y:st,w:W,h:p1.panel.y-4-st}}
  else{const a=CL(Math.floor(H*(two?.13:.15)),56,68),br=CL(Math.round(a*.6),33,40),side=Math.max(3*a+24,4*br+44);
   const B=H-6;
-  if(!two){const rx0=W-side,bcy=B-40-br,pad={cx:side/2,cy:bcy-br-a*1.05-16,a};   // Oct 30 (Peter): JUMP right panel, other button left panel, mirrored
-   o.pads.push({panel:{x:4,y:pad.cy-1.5*a-10,w:side-8,h:B-(pad.cy-1.5*a-10)},pad,ab:{b:{cx:side/2,cy:bcy,r:br},a:{cx:rx0+side/2,cy:bcy,r:br}},rot:0,
-    panel2:{x:rx0+4,y:bcy-br-40,w:side-8,h:B-(bcy-br-40)}})}
+  if(!two){const rx0=W-side,pad={cx:side/2,cy:B-4-1.5*a,a};   // Oct 30 9:45 PM (Peter's reference): JUMP big orange bottom-right, other button smaller green just left of it and a bit higher (both in the right panel)
+   const big=CL(H*.21,72,96),sm=Math.round(big*.82),ax=W-14-big/2,ay=H-12-big/2,bx=ax-big/2-10-sm/2,by=H-12-big*.18-sm/2,p2y=Math.min(ay-big/2,by-sm/2)-14,p2x=Math.min(rx0+4,bx-sm/2-10);
+   o.pads.push({panel:{x:4,y:pad.cy-1.5*a-10,w:side-8,h:B-(pad.cy-1.5*a-10)},pad,ab:{b:{cx:bx,cy:by,r:sm/2},a:{cx:ax,cy:ay,r:big/2}},rot:0,big,
+    panel2:{x:p2x,y:p2y,w:W-4-p2x,h:B-p2y}})}
   else{for(const s of [0,1]){const x0=s?W-side:0,pad={cx:x0+side/2,cy:B-4-1.5*a,a},top=pad.cy-1.5*a-24-br;
     const ab={b:{cx:x0+side/2-br-6,cy:top,r:br},a:{cx:x0+side/2+br+6,cy:top-br*.5,r:br}};
     o.pads.push({panel:{x:x0+4,y:top-br*1.5-14,w:side-8,h:B-(top-br*1.5-14)},pad,ab,rot:0})}}
   o.field={x:side,y:0,w:W-2*side,h:H}}
  return o}
-function rot180(p){const R=q=>({cx:W-q.cx,cy:H-q.cy,r:q.r,a:q.a});return{panel:{x:W-p.panel.x-p.panel.w,y:H-p.panel.y-p.panel.h,w:p.panel.w,h:p.panel.h},pad:R(p.pad),ab:{a:R(p.ab.a),b:R(p.ab.b)},rot:PI}}
+function rot180(p){const R=q=>({cx:W-q.cx,cy:H-q.cy,r:q.r,a:q.a});return{panel:{x:W-p.panel.x-p.panel.w,y:H-p.panel.y-p.panel.h,w:p.panel.w,h:p.panel.h},pad:R(p.pad),ab:{a:R(p.ab.a),b:R(p.ab.b)},rot:PI,big:p.big}}
 // ---------- drawing helpers ----------
 function rr(x,y,w,h,r,fill,stroke,lw){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,Math.min(r,w/2,h/2)):g.rect(x,y,w,h);if(fill){g.fillStyle=fill;g.fill()}if(stroke){g.strokeStyle=stroke;g.lineWidth=lw||2;g.stroke()}}
 function txt(s,x,y,sz,col,al='center',o={}){sz=Math.max(16,sz);g.font=(o.w||'900')+' '+sz+'px '+(o.f||FONT);g.textAlign=al;g.textBaseline='middle';
@@ -1056,13 +1058,16 @@ function drawPads(){const lab=(G&&G.M&&G.M.lab)||{a:'JUMP',b:'BOP'};
   if(LY.portrait){const nm=G&&G.two?(G.M.simul?(i?'PLAYER 2':'PLAYER 1'):(G.pl?'PLAYER 2':'PLAYER 1')):HERO.toUpperCase();txt(nm,(pd.ab.b.cx+pd.ab.a.cx)/2,pd.panel.y+24,fit(nm,16,pd.ab.a.cx-pd.ab.b.cx+2*pd.ab.a.r),i?'#8ef56a':'#ff86c4','center',{f:'ui-monospace,monospace'})}
   else if(G&&G.two&&G.M.simul)txt(i?'P2':'P1',pd.panel.x+22,pd.panel.y+22,16,i?'#8ef56a':'#ff86c4');
   // no D-pad (Peter 10/29): swipe and hold to move; hint where the pad used to be (arrows light up while you swipe that way)
-  {const hw=Math.max(60,Math.min(3*a,(LY.portrait?Math.min(pd.ab.a.cx-pd.ab.a.r-cx,cx-pd.ab.b.cx-pd.ab.b.r):(LY.two?pd.ab.b.cx-pd.ab.b.r-cx:a*1.5))*2-8));const M='ui-monospace,monospace';txt('SWIPE',cx,cy-12,fit('SWIPE',16,hw,{f:M}),'#8f8c99','center',{f:M});txt('TO MOVE',cx,cy+12,fit('TO MOVE',16,hw,{f:M}),'#8f8c99','center',{f:M});
+  {const hw=Math.max(60,Math.min(3*a,(LY.portrait?Math.min(cx-16,pd.ab.b.cx-pd.ab.b.r-cx):(LY.two?pd.ab.b.cx-pd.ab.b.r-cx:a*1.5))*2-8));const M='ui-monospace,monospace';txt('SWIPE',cx,cy-12,fit('SWIPE',16,hw,{f:M}),'#8f8c99','center',{f:M});txt('TO MOVE',cx,cy+12,fit('TO MOVE',16,hw,{f:M}),'#8f8c99','center',{f:M});
    const arm={l:[cx-a*1.05,cy],r:[cx+a*1.05,cy],u:[cx,cy-a*1.05],d:[cx,cy+a*1.05]},ang={l:PI,r:0,u:-PI/2,d:PI/2};
    for(const k of ['l','r','u','d']){const[x,y]=arm[k];if(k=='l'||k=='r'){if(Math.abs(x-cx)>hw/2+14)continue}tri(x,y,a*.16,ang[k],h[k]?'#ffd84a':'#5d5a66')}}
-  for(const k of ['b','a']){const q=pd.ab[k],on=h[k],dy=on?2:0;g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
-   g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);g.fillStyle=on?'#ff6a5a':'#d1302f';g.fill();g.lineWidth=3;g.strokeStyle=on?'#ffd84a':'#7c1515';g.stroke();
-   g.beginPath();g.arc(q.cx-q.r*.3,q.cy+dy-q.r*.35,q.r*.28,0,TAU);g.fillStyle='rgba(255,255,255,.28)';g.fill();
-   txt(k.toUpperCase(),q.cx,q.cy+dy+1,Math.round(q.r*.75),'#fff','center',{stroke:3,sc:'rgba(0,0,0,.45)'});txt(lab[k],q.cx,q.cy+q.r+13,16,'#cfcad8','center',{f:'ui-monospace,monospace'})}
+  // Oct 30 9:45 PM (Peter's reference): JUMP-type button big orange, other button green, white bold outlined label on the button
+  for(const k of ['b','a']){const q=pd.ab[k],on=h[k],dy=on?3:0,x=q.cx,y=q.cy+dy,r=q.r,big=pd.big||pd0.big||pd.ab.a.r*2,org=k==='a',fx=x-r*.3,fy=y-r*.4;g.save();
+   g.shadowColor=org?'rgba(255,154,58,.6)':'rgba(80,208,96,.6)';g.shadowBlur=org?22:18;const gr=g.createRadialGradient(fx,fy,0,fx,fy,r*1.55);
+   if(org){gr.addColorStop(0,on?'#fff0d0':'#ffe0b0');gr.addColorStop(.385,'#ff8a1a');gr.addColorStop(1,'#a03a00')}else{gr.addColorStop(0,on?'#efffe8':'#d8ffd0');gr.addColorStop(.385,'#38b040');gr.addColorStop(1,'#0a5a12')}
+   g.beginPath();g.arc(x,y,r,0,TAU);g.fillStyle=gr;g.fill();g.shadowBlur=0;g.shadowColor='transparent';const sh=g.createLinearGradient(0,y+r*.35,0,y+r);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(0,0,0,.35)');g.fillStyle=sh;g.fill();
+   g.lineWidth=3;g.strokeStyle='#fff';g.stroke();const L=lab[k];let fs=(org?.30:.24)*big;g.font='900 '+fs+'px sans-serif';const tw=g.measureText(L).width;if(tw>r*1.8){fs*=r*1.8/tw;g.font='900 '+fs+'px sans-serif'}
+   g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';g.lineWidth=fs*.22;g.strokeStyle='#000';g.strokeText(L,x,y+1);g.fillStyle='#fff';g.fillText(L,x,y+1);g.restore()}
   g.restore()})}
 // ---------- system buttons (pause / mute) ----------
 function sysBtns(){let x,y;const s=48;if(!LY.portrait){x=W-s-8;y=8}else if(LY.two&&state==='play'){x=LY.field.x+6;y=LY.field.y+LY.field.h/2-s-4}else{x=W-s-8;y=(LY.field?LY.field.y:0)+6}

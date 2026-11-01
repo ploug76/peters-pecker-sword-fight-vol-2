@@ -44,19 +44,21 @@ function layout(two){const o={W,H,portrait:H>=W*1.05,two:!!two,pads:[]};
  if(o.portrait){const a=CL(Math.floor(Math.min(W/7,H*(two?.075:.09))),56,72),br=CL(Math.round(a*.6),33,42),ph=3*a+(two?30:52);
   // Oct 30 9:45 PM (Peter's reference): JUMP (A) big orange bottom-right, other button (B) smaller green just left of it and a bit higher; swipe hint on the left
   const mk=(py)=>{const pb=py+ph+6,big=CL(ph*.36,92,124),sm=Math.round(big*.84),bot=CL(ph*.14,18,46);
-   const ax=W-16-big/2,ay=pb-bot-big/2,bx=ax-big/2-14-sm/2,by=Math.max(py+14+sm/2,pb-bot-big*.42-sm/2);const pad={cx:(14+bx-sm/2)/2,cy:py+ph/2+6,a};
-   return{panel:{x:6,y:py,w:W-12,h:ph},pad,ab:{b:{cx:bx,cy:by,r:sm/2},a:{cx:ax,cy:ay,r:big/2}},rot:0,big}};
+   // Peter Oct 31 9:10 PM: NES pad - other (green) left, JUMP (orange) right, level, both the old green size
+   const ax=W-16-sm/2,ay=Math.max(py+14+sm/2,pb-bot-sm/2),bx=ax-sm-18,by=ay;const pad={cx:(14+bx-sm/2)/2,cy:py+ph/2+6,a};
+   return{panel:{x:6,y:py,w:W-12,h:ph},pad,ab:{b:{cx:bx,cy:by,r:sm/2},a:{cx:ax,cy:ay,r:sm/2}},rot:0,big:sm}};
   const p1=mk(H-6-sb-ph);o.pads.push(p1);
   if(two){const p2=rot180(mk(H-6-sb-ph));p2.panel.y=Math.max(p2.panel.y-0,6);o.pads.push(p2);o.field={x:0,y:p2.panel.y+p2.panel.h+4,w:W,h:p1.panel.y-4-(p2.panel.y+p2.panel.h+4)}}
   else o.field={x:0,y:st,w:W,h:p1.panel.y-4-st}}
  else{const a=CL(Math.floor(H*(two?.13:.15)),56,68),br=CL(Math.round(a*.6),33,40),side=Math.max(3*a+24,4*br+44);
   const B=H-6;
   if(!two){const rx0=W-side,pad={cx:side/2,cy:B-4-1.5*a,a};   // Oct 30 9:45 PM (Peter's reference): JUMP big orange bottom-right, other button smaller green just left of it and a bit higher (both in the right panel)
-   const big=CL(H*.21,72,96),sm=Math.round(big*.82),ax=W-14-big/2,ay=H-12-big/2,bx=ax-big/2-10-sm/2,by=H-12-big*.18-sm/2,p2y=Math.min(ay-big/2,by-sm/2)-14,p2x=Math.min(rx0+4,bx-sm/2-10);
-   o.pads.push({panel:{x:4,y:pad.cy-1.5*a-10,w:side-8,h:B-(pad.cy-1.5*a-10)},pad,ab:{b:{cx:bx,cy:by,r:sm/2},a:{cx:ax,cy:ay,r:big/2}},rot:0,big,
+   // Peter Oct 31 9:10 PM: NES pad - other (green) left, JUMP (orange) right, level, both the old green size
+   const big=CL(H*.21,72,96),sm=Math.round(big*.82),ax=W-14-sm/2,ay=H-12-sm/2,bx=ax-sm-16,by=ay,p2y=Math.min(ay-sm/2,by-sm/2)-14,p2x=Math.min(rx0+4,bx-sm/2-10);
+   o.pads.push({panel:{x:4,y:pad.cy-1.5*a-10,w:side-8,h:B-(pad.cy-1.5*a-10)},pad,ab:{b:{cx:bx,cy:by,r:sm/2},a:{cx:ax,cy:ay,r:sm/2}},rot:0,big:sm,
     panel2:{x:p2x,y:p2y,w:W-4-p2x,h:B-p2y}})}
   else{for(const s of [0,1]){const x0=s?W-side:0,pad={cx:x0+side/2,cy:B-4-1.5*a,a},top=pad.cy-1.5*a-24-br;
-    const ab={b:{cx:x0+side/2-br-6,cy:top,r:br},a:{cx:x0+side/2+br+6,cy:top-br*.5,r:br}};
+    const ab={b:{cx:x0+side/2-br-6,cy:top,r:br},a:{cx:x0+side/2+br+6,cy:top,r:br}};   // Peter Oct 31: NES pad, level
     o.pads.push({panel:{x:x0+4,y:top-br*1.5-14,w:side-8,h:B-(top-br*1.5-14)},pad,ab,rot:0})}}
   o.field={x:side,y:0,w:W-2*side,h:H}}
  return o}
